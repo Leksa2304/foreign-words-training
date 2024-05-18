@@ -158,3 +158,13 @@ buttonExam.addEventListener("click", function() {
     renderExamCards();
 
 });
+
+// обработчик на click по первой карточке
+examCardsContainer.addEventListener("click", function(event) {
+    const element = event.target.closest("div");
+    let checkElement = [document.querySelector(".correct")]; // массив для элемента первого клика
+
+    if (checkElement[0] === null) { // если нет в массиве зеленой карточки, то добавить зеленый на кликнутый элемент
+        element.classList.add("correct");
+    }
+});
