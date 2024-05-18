@@ -10,7 +10,6 @@ const buttonExam = document.querySelector("#exam"); //кнопка тестир�
 const currentWord = document.querySelector("#current-word"); // номер текущего слова
 const totalWord = document.querySelector("#total-word"); // всего слов
 const shuffleWords = document.querySelector("#shuffle-words"); // кнопка перемешать слова
-const content = document.querySelector("#shuffle-words"); // кнопка перемешать слова
 
 const divCardBack = document.querySelector("#card-back div");
 const spanExample = divCardBack.querySelector("span"); // предложение-пример 
@@ -48,7 +47,7 @@ for (let i = 0; i < 5; i++) {
 
     words5.push(randomNoRepeats(copy)); // добавление в массив пяти слов
 }
-console.log(words5);
+
 // отображение карточки
 let cardIndex = 0; // индекс объекта в массиве
 showCard(cardIndex);
@@ -108,52 +107,37 @@ shuffleWords.addEventListener("click", function() {
     shuffle(words5);
 })
 
-
 // Режим тестированиия - проверки знаний
-// создание карточек
 
-// создание англ.карточки
-function createExamCardEng(obj) { // obj - объект массива
+// создание карточки в режиме тестирования
+function createExamCard(obj) { // obj - объект массива
     const card = document.createElement("div");
+    card.classList.add("card");
 
-    const cardEng = document.createElement("div");
-    cardEng.classList.add("card");
-
-    cardEng.innerHTML = `<h3>${obj.word}</h3>`;
-    card.appendChild(cardEng);
+    const cardWord = document.createElement("p");
+    cardWord.textContent = obj;
+    card.append(cardWord);
     return card;
 }
 
-// создание рус.карточки
-function createExamCardRu(obj) {
-    const card = document.createElement("div");
-
-    const cardRu = document.createElement("div");
-    cardRu.classList.add("card");
-    cardRu.innerHTML = `<h3>${obj.translation}</h3>`;
-
-    card.appendChild(cardRu);
-    return card;
-}
 
 // вставка карточек
 function renderExamCards() {
 
     const fragment = new DocumentFragment();
-    const arrForExam = []; // для перемешивания слов при тестировании
+    const arrForExam = []; // создаем массив для перемешивания слов при тестировании
     words5.forEach((obj) => {
-        const [question, answer] = [createExamCardEng(obj),
-            createExamCardRu(obj),
+        const [engWord, ruWord] = [createExamCard(obj.word),
+            createExamCard(obj.translation),
 
         ];
-        arrForExam.push(question, answer);
+        arrForExam.push(engWord, ruWord);
     });
 
     shuffle(arrForExam);
     fragment.append(...arrForExam);
     examCardsContainer.innerHTML = "";
     examCardsContainer.append(fragment);
-    console.log(arrForExam);
 }
 
 // функция для перемешивания элементов массива 
@@ -169,7 +153,8 @@ function shuffle(array) {
 buttonExam.addEventListener("click", function() {
 
     document.querySelector(".study-cards").classList.add("hidden"); // скрываем режим обучения
-    document.getElementById("study-mode").classList.add("hidden"); // скрываем статистику study-mode
-    document.getElementById("exam-mode").classList.remove("hidden");
+    document.querySelector("#study-mode").classList.add("hidden"); // скрываем статистику study-mode
+    document.querySelector("#exam-mode").classList.remove("hidden");
     renderExamCards();
+
 });
