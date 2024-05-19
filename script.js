@@ -60,7 +60,6 @@ let cardIndex = 0; // индекс объекта в массиве
 showCard(wordsLearning[cardIndex]);
 
 
-
 function nextCard() { // переход к следующей карточке
     if (cardIndex < (maxWords - 1)) {
         cardIndex = ++cardIndex;
@@ -115,6 +114,7 @@ buttonBack.addEventListener("click", function() {
 // обработчик на кнопку Перемешать слова
 shuffleWords.addEventListener("click", function() {
     shuffle(wordsLearning);
+    showCard(wordsLearning[cardIndex]);
 })
 
 // Режим тестированиия - проверки знаний
