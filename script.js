@@ -29,23 +29,23 @@ const words = [
     { word: "cucumber", translation: "огурец", example: "Сucumber is 90 percent water" },
 ]
 
+const maxWords = 5; // кол-во карточек для изучения
+
 const copy = words.slice(); // создаем копию массива
 
-function randomNoRepeats(arr) { // функция для генерации карточки (случайного объекта из массива)
+function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
 
-    const index = Math.floor(Math.random() * copy.length);
-    let obj = copy[index]; // получаем случайный объект
-    copy.splice(index, 1); // удаляем полученный объект из копии массива, для дальнейшего генерирования неповторяющегося объекта
+    const index = Math.floor(Math.random() * arr.length);
+    let obj = arr[index]; // получаем случайный объект
+    arr.splice(index, 1); // удаляем полученный объект из копии массива, для дальнейшего генерирования неповторяющегося объекта
     return obj;
 };
 
-const getRandomObject = randomNoRepeats(copy); // случайный неповторяющийся объект массива - карточка
+let wordsLearning = []; // массив слов для изучения
 
-let words5 = [];
+for (let i = 0; i < maxWords; i++) {
 
-for (let i = 0; i < 5; i++) {
-
-    words5.push(randomNoRepeats(copy)); // добавление в массив пяти слов
+    wordsLearning.push(getRandomWord(copy)); // добавление в массив слов для изучения
 }
 
 // отображение карточки
@@ -53,9 +53,9 @@ let cardIndex = 0; // индекс объекта в массиве
 showCard(cardIndex);
 
 function showCard(index) { // функция создания карточки
-    cardFront.innerHTML = `${words5[index].word}`;
-    cardBack.innerHTML = `${words5[index].translation}`;
-    spanExample.innerHTML = `${words5[index].example}`;
+    cardFront.innerHTML = `${wordsLearning[index].word}`;
+    cardBack.innerHTML = `${wordsLearning[index].translation}`;
+    spanExample.innerHTML = `${wordsLearning[index].example}`;
 }
 
 function nextCard() { // переход к следующей карточке
@@ -104,7 +104,7 @@ buttonBack.addEventListener("click", function() {
 
 // обработчик на кнопку Перемешать слова
 shuffleWords.addEventListener("click", function() {
-    shuffle(words5);
+    shuffle(wordsLearning);
 })
 
 // Режим тестированиия - проверки знаний
@@ -126,12 +126,13 @@ function renderExamCards() {
 
     const fragment = new DocumentFragment();
     const arrForExam = []; // создаем массив для перемешивания слов при тестировании
-    words5.forEach((obj) => {
+    wordsLearning.forEach((obj) => {
         const [engWord, ruWord] = [createExamCard(obj.word),
             createExamCard(obj.translation),
 
         ];
         arrForExam.push(engWord, ruWord);
+
     });
 
     shuffle(arrForExam);
@@ -162,6 +163,7 @@ buttonExam.addEventListener("click", function() {
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
     const element = event.target.closest("div");
+
     let checkElement = [document.querySelector(".correct")]; // массив для элемента первого клика
 
     if (checkElement[0] === null) { // если нет в массиве зеленой карточки, то добавить зеленый на кликнутый элемент
