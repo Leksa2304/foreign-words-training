@@ -41,6 +41,13 @@ function getRandomWord(arr) { // функция для генерации кар
     return obj;
 };
 
+function showCard(card) { // функция создания карточки
+    cardFront.innerHTML = `${card.word}`;
+    cardBack.innerHTML = `${card.translation}`;
+    spanExample.innerHTML = `${card.example}`;
+}
+
+
 let wordsLearning = []; // массив слов для изучения
 
 for (let i = 0; i < maxWords; i++) {
@@ -50,56 +57,59 @@ for (let i = 0; i < maxWords; i++) {
 
 // отображение карточки
 let cardIndex = 0; // индекс объекта в массиве
-showCard(cardIndex);
+showCard(wordsLearning[cardIndex]);
 
-function showCard(index) { // функция создания карточки
-    cardFront.innerHTML = `${wordsLearning[index].word}`;
-    cardBack.innerHTML = `${wordsLearning[index].translation}`;
-    spanExample.innerHTML = `${wordsLearning[index].example}`;
-}
+
 
 function nextCard() { // переход к следующей карточке
-    cardIndex = ++cardIndex;
-    showCard(cardIndex);
+    if (cardIndex < (maxWords - 1)) {
+        cardIndex = ++cardIndex;
+        showCard(wordsLearning[cardIndex]);
+    }
 }
 
 function backCard() { // переход к карточке назад
-    cardIndex = --cardIndex;
-    showCard(cardIndex);
+    if (cardIndex > 0) {
+        cardIndex = --cardIndex;
+        showCard(wordsLearning[cardIndex]);
+    }
 }
-
 
 // обработчик на click по карточке
 slider.addEventListener("click", function() {
     flipCard.classList.toggle("active");
 });
 
+// функция блокировки кнопок
+function blockButtons() {
+    currentWord.textContent = cardIndex + 1;
+
+    if (cardIndex === (maxWords - 1)) {
+        buttonNext.disabled = true; // выкл.
+    }
+    if (cardIndex < (maxWords - 1)) {
+        buttonNext.disabled = false; // вкл.
+    }
+    if (cardIndex > 0) {
+        buttonBack.disabled = false; // вкл.
+    }
+    if (cardIndex === 0) {
+        buttonBack.disabled = true; // выкл.
+        buttonNext.disabled = false; // вкл.
+    }
+}
 
 // обработчик на стрелку вперед
 buttonNext.addEventListener("click", function() {
     nextCard();
-    currentWord.textContent++;
-
-    if (currentWord.textContent > 1) {
-        buttonBack.disabled = false; // включить кнопку назад
-    }
-
-    if (currentWord.textContent == 5) {
-        buttonNext.disabled = true; // заблокировать кнопку вперед
-    }
+    blockButtons();
 });
+
 
 // обработчик на стрелку назад
 buttonBack.addEventListener("click", function() {
     backCard();
-
-    currentWord.textContent--;
-
-    if (currentWord.textContent == 1) {
-
-        buttonNext.disabled = false; // включить кнопку вперед
-        buttonBack.disabled = true; // заблокировать кнопку назад
-    }
+    blockButtons();
 });
 
 // обработчик на кнопку Перемешать слова
