@@ -120,12 +120,14 @@ shuffleWords.addEventListener("click", function() {
 // Режим тестированиия - проверки знаний
 
 // создание карточки в режиме тестирования
-function createExamCard(obj) { // obj - объект массива
+function createExamCard(text, otherText) { // obj - объект массива
     const card = document.createElement("div");
     card.classList.add("card");
+    card.setAttribute("word", text);
+    card.setAttribute("translation", otherText);
 
     const cardWord = document.createElement("p");
-    cardWord.textContent = obj;
+    cardWord.textContent = text;
     card.append(cardWord);
     return card;
 }
@@ -137,12 +139,10 @@ function renderExamCards() {
     const fragment = new DocumentFragment();
     const arrForExam = []; // создаем массив для перемешивания слов при тестировании
     wordsLearning.forEach((obj) => {
-        const [engWord, ruWord] = [createExamCard(obj.word),
-            createExamCard(obj.translation),
+        const engWord = createExamCard(obj.word, obj.translation);
+        const ruWord = createExamCard(obj.translation, obj.word);
 
-        ];
         arrForExam.push(engWord, ruWord);
-
     });
 
     shuffle(arrForExam);
