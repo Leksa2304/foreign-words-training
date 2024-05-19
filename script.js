@@ -160,6 +160,8 @@ function shuffle(array) {
     return array;
 }
 
+let examWords = []; // массив для двух карточек для сравнения
+
 // обработчик на кнопку Тестирование
 buttonExam.addEventListener("click", function() {
 
@@ -167,16 +169,34 @@ buttonExam.addEventListener("click", function() {
     document.querySelector("#study-mode").classList.add("hidden"); // скрываем статистику study-mode
     document.querySelector("#exam-mode").classList.remove("hidden");
     renderExamCards();
+    examWords = [];
 
 });
 
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
     const element = event.target.closest("div");
+    examWords.push(element); // добавлять кликнутую карточку в массив двух карточек
 
-    let checkElement = [document.querySelector(".correct")]; // массив для элемента первого клика
-
-    if (checkElement[0] === null) { // если нет в массиве зеленой карточки, то добавить зеленый на кликнутый элемент
+    if (examWords.length === 1) // это первая карточка
         element.classList.add("correct");
+
+    if (examWords.length === 2) { // это две карточки
+        checkExamWords(examWords);
+        examWords = [];
     }
 });
+
+function checkExamWords(checkedWords) {
+    if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
+        checkedWords[1].classList.add("correct");
+        checkedWords[0].classList.add("fade-out");
+        checkedWords[1].classList.add("fade-out");
+    } else {
+        checkedWords[1].classList.add("wrong");
+        setTimeout(function() {
+            checkedWords[0].classList.remove("correct");
+            checkedWords[1].classList.remove("wrong");
+        }, 500);
+    }
+};
