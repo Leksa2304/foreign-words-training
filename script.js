@@ -235,11 +235,24 @@ resultsModal.append(copyTemplate);
 let correctWords = 0; // счетчик верных ответов
 
 
+// % верных слов
+const percent = 100;
+let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
+
+let correctPercent = document.querySelector("#correct-percent");
+
+let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
+
+
 function checkExamWords(checkedWords) { // проверка слов
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
 
         checkedWords[1].classList.add("correct");
         ++correctWords;
+
+        correctNumPercent = correctNumPercent + percentOneCard;
+
+        correctPercent.textContent = `${correctNumPercent}%`;
 
         checkedWords[0].classList.add("fade-out");
         checkedWords[1].classList.add("fade-out");
@@ -285,6 +298,10 @@ function resetExamMode() { // сброс режима экзамена
     examCardsContainer.innerHTML = "";
     examWords = [];
     correctWords = 0;
+    correctNumPercent = 0;
+    correctPercent.textContent = `${correctNumPercent}%`;
+
+
     examMode.classList.add("hidden"); // скрываем статистику exam
     resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
 }
