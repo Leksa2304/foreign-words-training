@@ -21,6 +21,7 @@ const studyCards = document.querySelector(".study-cards");
 const time = document.querySelector("#time");
 const timer = document.querySelector("#timer");
 const resultsModal = document.querySelector(".results-modal");
+const resultsContent = document.querySelector(".results-contenеt");
 
 
 const words = [
@@ -207,21 +208,7 @@ buttonExam.addEventListener("click", function() {
     timerId = setInterval(startTimer, 1000); // запуск таймера
     examWords = [];
 
-
 });
-
-
-const resultsContent = document.querySelector(".results-contenеt");
-const wordStatsTemplate = document.querySelector("#word-stats"); // шаблон статистики ответов
-
-
-let correctPercent = document.querySelector("#correct-percent");
-let currrentPersent = parseInt(correctPercent.textContent);
-
-
-const percent = 100;
-let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
-let correctWords = 0;
 
 
 // обработчик на click по первой карточке
@@ -237,6 +224,20 @@ examCardsContainer.addEventListener("click", function(event) {
         examWords = [];
     }
 });
+
+
+// создание статистики
+const template = document.querySelector("#word-stats"); // шаблон статистики ответов
+const copyTemplate = template.content.cloneNode(true); // копия шаблона
+resultsModal.append(copyTemplate);
+
+let correctPercent = document.querySelector("#correct-percent");
+let currrentPersent = parseInt(correctPercent.textContent);
+
+const percent = 100;
+let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
+let correctWords = 0;
+
 
 
 function checkExamWords(checkedWords) { // проверка слов
