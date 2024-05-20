@@ -14,6 +14,8 @@ const shuffleWords = document.querySelector("#shuffle-words"); // кнопка �
 const divCardBack = document.querySelector("#card-back div");
 const spanExample = divCardBack.querySelector("span"); // предложение-пример 
 const examCardsContainer = document.querySelector("#exam-cards");
+const time = document.querySelector("#time");
+//const resultsModal = document.querySelector(".results-modal");
 
 
 const words = [
@@ -161,6 +163,32 @@ function shuffle(array) {
     return array;
 }
 
+
+let timerId;
+let seconds = 0;
+let minutes = 0;
+
+function startTimer() {
+
+    seconds++;
+
+    if (seconds === 59) {
+        minutes++;
+        seconds = 0;
+    }
+
+    time.textContent = `${format(minutes)}:${format(seconds)}`;
+
+}
+
+//добавление незначащих нулей
+function format(val) {
+    if (val < 10) {
+        return `0${val}`
+    }
+    return val;
+}
+
 let examWords = []; // массив для двух карточек для сравнения
 
 // обработчик на кнопку Тестирование
@@ -170,7 +198,10 @@ buttonExam.addEventListener("click", function() {
     document.querySelector("#study-mode").classList.add("hidden"); // скрываем статистику study-mode
     document.querySelector("#exam-mode").classList.remove("hidden");
     renderExamCards();
+
+    timerId = setInterval(startTimer, 1000);
     examWords = [];
+
 
 });
 
@@ -182,9 +213,6 @@ const wordStatsTemplate = document.querySelector("#word-stats"); // шаблон
 const examMode = document.querySelector("#exam-mode");
 let correctPercent = document.querySelector("#correct-percent");
 let currrentPersent = parseInt(correctPercent.textContent);
-
-//console.log(currrentPersent);
-
 
 
 const percent = 100;
@@ -226,8 +254,9 @@ function checkExamWords(checkedWords) {
     }
 
     if (correctWords === maxWords) { // проверка на все отвеченные слова
+        clearTimeout(timerId);
         setTimeout(() => {
-            alert("Тестирование успешно пройдено")
+            alert("Тестирование успешно пройдено!")
         }, 500);
     }
 
