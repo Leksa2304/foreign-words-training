@@ -126,6 +126,7 @@ function createExamCard(text, otherText) { // obj - объект массива
     card.setAttribute("word", text);
     card.setAttribute("translation", otherText);
 
+
     const cardWord = document.createElement("p");
     cardWord.textContent = text;
     card.append(cardWord);
@@ -173,30 +174,61 @@ buttonExam.addEventListener("click", function() {
 
 });
 
+
+const resultsContent = document.querySelector(".results-contenеt");
+const wordStatsTemplate = document.querySelector("#word-stats"); // шаблон статистики ответов
+
+
+const examMode = document.querySelector("#exam-mode");
+let correctPercent = document.querySelector("#correct-percent");
+let currrentPersent = parseInt(correctPercent.textContent);
+
+//console.log(currrentPersent);
+
+
+
+const percent = 100;
+let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
+let correctWords = 0;
+
+
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
     const element = event.target.closest("div");
     examWords.push(element); // добавлять кликнутую карточку в массив двух карточек
 
-    if (examWords.length === 1) // это первая карточка
+    if (examWords.length === 1) { // это первая карточка
         element.classList.add("correct");
-
+    }
     if (examWords.length === 2) { // это две карточки
         checkExamWords(examWords);
         examWords = [];
     }
 });
 
+
 function checkExamWords(checkedWords) {
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
+
         checkedWords[1].classList.add("correct");
+        ++correctWords;
+
         checkedWords[0].classList.add("fade-out");
         checkedWords[1].classList.add("fade-out");
+
     } else {
         checkedWords[1].classList.add("wrong");
+
         setTimeout(function() {
             checkedWords[0].classList.remove("correct");
             checkedWords[1].classList.remove("wrong");
         }, 500);
     }
+
+    if (correctWords === maxWords) { // проверка на все отвеченные слова
+        setTimeout(() => {
+            alert("Тестирование успешно пройдено")
+        }, 500);
+    }
+
 };
