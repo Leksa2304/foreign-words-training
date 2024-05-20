@@ -22,6 +22,8 @@ const time = document.querySelector("#time");
 const timer = document.querySelector("#timer");
 const resultsModal = document.querySelector(".results-modal");
 const resultsContent = document.querySelector(".results-contenеt");
+const sliderControls = document.querySelector(".slider-controls");
+const content = document.querySelector("content");
 
 
 const words = [
@@ -54,7 +56,6 @@ function showCard(card) { // функция создания карточки
     cardBack.innerHTML = `${card.translation}`;
     spanExample.innerHTML = `${card.example}`;
 }
-
 
 let wordsLearning = []; // массив слов для изучения
 
@@ -158,7 +159,9 @@ function renderExamCards() {
     fragment.append(...arrForExam);
     examCardsContainer.innerHTML = "";
     examCardsContainer.append(fragment);
+
 }
+
 
 // функция для перемешивания элементов массива 
 function shuffle(array) {
@@ -184,7 +187,6 @@ function startTimer() { //функция таймера
     }
 
     time.textContent = `${format(minutes)}:${format(seconds)}`;
-
 }
 
 //добавление незначащих нулей
@@ -225,19 +227,12 @@ examCardsContainer.addEventListener("click", function(event) {
     }
 });
 
-
 // создание статистики
 const template = document.querySelector("#word-stats"); // шаблон статистики ответов
 const copyTemplate = template.content.cloneNode(true); // копия шаблона
 resultsModal.append(copyTemplate);
 
-let correctPercent = document.querySelector("#correct-percent");
-let currrentPersent = parseInt(correctPercent.textContent);
-
-const percent = 100;
-let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
-let correctWords = 0;
-
+let correctWords = 0; // счетчик верных ответов
 
 
 function checkExamWords(checkedWords) { // проверка слов
@@ -261,6 +256,7 @@ function checkExamWords(checkedWords) { // проверка слов
     if (correctWords === maxWords) { // проверка на все отвеченные слова
         clearTimeout(timerId); // остановка таймера
 
+
         setTimeout(() => {
             alert("Тестирование успешно пройдено!")
         }, 500);
@@ -270,5 +266,34 @@ function checkExamWords(checkedWords) { // проверка слов
         }, 1000);
     }
     timer.textContent = `${time.textContent}`;
-
 };
+
+
+
+// кнопка Назад к тренировке. Вернуться в режим тренировки, если не готов
+const buttonTest = document.createElement("button");
+buttonTest.textContent = "Назад к тренировке";
+examMode.append(buttonTest);
+
+
+function resetExamMode() { // сброс режима экзамена
+    clearTimeout(timerId);
+    minutes = 0;
+    seconds = 0;
+    time.textContent = "";
+    time.textContent = `${format(minutes)}:${format(seconds)}`;
+    examCardsContainer.innerHTML = "";
+    examWords = [];
+    correctWords = 0;
+    examMode.classList.add("hidden"); // скрываем статистику exam
+    resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
+}
+
+
+buttonTest.addEventListener("click", function() {
+    resetExamMode();
+
+    studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
+    studyCards.classList.remove("hidden"); // отобразить карточки в режиме тренировки
+
+})
