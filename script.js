@@ -14,8 +14,13 @@ const shuffleWords = document.querySelector("#shuffle-words"); // кнопка �
 const divCardBack = document.querySelector("#card-back div");
 const spanExample = divCardBack.querySelector("span"); // предложение-пример 
 const examCardsContainer = document.querySelector("#exam-cards");
+
+const studyMode = document.querySelector("#study-mode");
+const examMode = document.querySelector("#exam-mode");
+const studyCards = document.querySelector(".study-cards");
 const time = document.querySelector("#time");
-//const resultsModal = document.querySelector(".results-modal");
+const timer = document.querySelector("#timer");
+const resultsModal = document.querySelector(".results-modal");
 
 
 const words = [
@@ -168,7 +173,7 @@ let timerId;
 let seconds = 0;
 let minutes = 0;
 
-function startTimer() {
+function startTimer() { //функция таймера
 
     seconds++;
 
@@ -194,12 +199,12 @@ let examWords = []; // массив для двух карточек для ср
 // обработчик на кнопку Тестирование
 buttonExam.addEventListener("click", function() {
 
-    document.querySelector(".study-cards").classList.add("hidden"); // скрываем режим обучения
-    document.querySelector("#study-mode").classList.add("hidden"); // скрываем статистику study-mode
-    document.querySelector("#exam-mode").classList.remove("hidden");
+    studyCards.classList.add("hidden"); // скрываем режим обучения
+    studyMode.classList.add("hidden"); // скрываем статистику study-mode
+    examMode.classList.remove("hidden");
     renderExamCards();
 
-    timerId = setInterval(startTimer, 1000);
+    timerId = setInterval(startTimer, 1000); // запуск таймера
     examWords = [];
 
 
@@ -210,7 +215,6 @@ const resultsContent = document.querySelector(".results-contenеt");
 const wordStatsTemplate = document.querySelector("#word-stats"); // шаблон статистики ответов
 
 
-const examMode = document.querySelector("#exam-mode");
 let correctPercent = document.querySelector("#correct-percent");
 let currrentPersent = parseInt(correctPercent.textContent);
 
@@ -235,7 +239,7 @@ examCardsContainer.addEventListener("click", function(event) {
 });
 
 
-function checkExamWords(checkedWords) {
+function checkExamWords(checkedWords) { // проверка слов
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
 
         checkedWords[1].classList.add("correct");
@@ -254,10 +258,16 @@ function checkExamWords(checkedWords) {
     }
 
     if (correctWords === maxWords) { // проверка на все отвеченные слова
-        clearTimeout(timerId);
+        clearTimeout(timerId); // остановка таймера
+
         setTimeout(() => {
             alert("Тестирование успешно пройдено!")
         }, 500);
+
+        setTimeout(() => {
+            resultsModal.classList.remove("hidden");
+        }, 1000);
     }
+    timer.textContent = `${time.textContent}`;
 
 };
