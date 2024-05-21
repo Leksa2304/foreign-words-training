@@ -83,7 +83,7 @@ showCard(wordsLearning[cardIndex]);
 wordsProgress.value = percentOneCard;
 
 
-function nextCard() { // переход к следующей карточке
+function goToNextCard() { // переход к следующей карточке
     if (cardIndex < (maxWords - 1)) {
         cardIndex = ++cardIndex;
         showCard(wordsLearning[cardIndex]);
@@ -91,7 +91,7 @@ function nextCard() { // переход к следующей карточке
     }
 }
 
-function backCard() { // переход к карточке назад
+function goToBackCard() { // переход к карточке назад
     if (cardIndex > 0) {
         cardIndex = --cardIndex;
         showCard(wordsLearning[cardIndex]);
@@ -125,7 +125,7 @@ function blockButtons() {
 
 // обработчик на стрелку вперед
 buttonNext.addEventListener("click", function() {
-    nextCard();
+    goToNextCard();
     blockButtons();
 
 });
@@ -133,7 +133,7 @@ buttonNext.addEventListener("click", function() {
 
 // обработчик на стрелку назад
 buttonBack.addEventListener("click", function() {
-    backCard();
+    goToBackCard();
     blockButtons();
 });
 

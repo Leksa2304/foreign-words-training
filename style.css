@@ -262,3 +262,7 @@ progress {
         opacity: 0;
     }
 }
+
+#button-study {
+    margin-bottom: 10px;
+}
