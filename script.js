@@ -244,6 +244,15 @@ let correctPercent = document.querySelector("#correct-percent");
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
 
 
+// прогресс бар
+
+const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
+
+// обновление прогресс бара
+function updateProgressBar(data) { // параметр - процент верного ответа
+    examProgress.value = examProgress.value + data;
+}
+
 function checkExamWords(checkedWords) { // проверка слов
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
 
@@ -251,8 +260,10 @@ function checkExamWords(checkedWords) { // проверка слов
         ++correctWords;
 
         correctNumPercent = correctNumPercent + percentOneCard;
-
         correctPercent.textContent = `${correctNumPercent}%`;
+
+        updateProgressBar(percentOneCard); // прогресс бар
+
 
         checkedWords[0].classList.add("fade-out");
         checkedWords[1].classList.add("fade-out");
@@ -299,6 +310,8 @@ function resetExamMode() { // сброс режима экзамена
     examWords = [];
     correctWords = 0;
     correctNumPercent = 0;
+    examProgress.value = 0;
+
     correctPercent.textContent = `${correctNumPercent}%`;
 
 
