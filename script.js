@@ -338,7 +338,9 @@ function createButton(buttonID, buttonText, container) {
     const button = document.createElement("button");
     button.textContent = buttonText;
     button.id = buttonID;
+    button.style.marginBottom = "10px";
     container.append(button);
+
 }
 
 createButton("button-study", "Назад к тренировке", examMode); // кнопка Назад к тренировке
