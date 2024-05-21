@@ -28,8 +28,6 @@ const content = document.querySelector("content");
 const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
 
-
-
 const words = [
     { word: "dog", translation: "собака", example: "Dogs don't like cats" },
     { word: "watermelon", translation: "арбуз", example: "Watermelon is a large striped berry" },
@@ -49,7 +47,7 @@ const maxWords = 5; // кол-во карточек для изучения
 // верные ответы и % верных слов
 const percent = 100;
 let correctWords = 0; // счетчик верных ответов
-let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
+const percentOneCard = percent / maxWords; // процент верного ответа одной карточки
 let correctPercent = document.querySelector("#correct-percent");
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
 
@@ -162,6 +160,16 @@ function createExamCard(text, otherText) { // obj - объект массива
 }
 
 
+// функция для перемешивания элементов массива 
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let n = Math.floor(Math.random() * (i + 1));
+        [array[i], array[n]] = [array[n], array[i]];
+    }
+    return array;
+}
+
+
 // вставка карточек
 function renderExamCards() {
 
@@ -178,20 +186,9 @@ function renderExamCards() {
     fragment.append(...arrForExam);
     examCardsContainer.innerHTML = "";
     examCardsContainer.append(fragment);
-
 }
 
-
-// функция для перемешивания элементов массива 
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let n = Math.floor(Math.random() * (i + 1));
-        [array[i], array[n]] = [array[n], array[i]];
-    }
-    return array;
-}
-
-
+// таймер
 let timerId;
 let seconds = 0;
 let minutes = 0;
@@ -219,9 +216,7 @@ function format(val) {
 let examWords = []; // массив для двух карточек для сравнения
 
 
-
-
-// запуск режима экзамена
+// запуск режима Тестирования-экзамена
 function startExam() {
     studyCards.classList.add("hidden"); // скрываем режим обучения
     studyMode.classList.add("hidden"); // скрываем статистику study-mode
