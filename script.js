@@ -238,15 +238,18 @@ let correctWords = 0; // счетчик верных ответов
 // % верных слов
 const percent = 100;
 let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
-
 let correctPercent = document.querySelector("#correct-percent");
-
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
 
 
 // прогресс бар
-
+const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
+
+function updatePercent(data) { // обновление процента верных ответов
+    correctNumPercent = correctNumPercent + data;
+    correctPercent.textContent = `${correctNumPercent}%`;
+}
 
 // обновление прогресс бара
 function updateProgressBar(data) { // параметр - процент верного ответа
@@ -259,9 +262,9 @@ function checkExamWords(checkedWords) { // проверка слов
         checkedWords[1].classList.add("correct");
         ++correctWords;
 
-        correctNumPercent = correctNumPercent + percentOneCard;
-        correctPercent.textContent = `${correctNumPercent}%`;
-
+        // correctNumPercent = correctNumPercent + percentOneCard;
+        // correctPercent.textContent = `${correctNumPercent}%`;
+        updatePercent(percentOneCard); // процент правильных ответов
         updateProgressBar(percentOneCard); // прогресс бар
 
 
@@ -311,9 +314,7 @@ function resetExamMode() { // сброс режима экзамена
     correctWords = 0;
     correctNumPercent = 0;
     examProgress.value = 0;
-
     correctPercent.textContent = `${correctNumPercent}%`;
-
 
     examMode.classList.add("hidden"); // скрываем статистику exam
     resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
