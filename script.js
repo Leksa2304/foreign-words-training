@@ -218,9 +218,11 @@ function format(val) {
 
 let examWords = []; // массив для двух карточек для сравнения
 
-// обработчик на кнопку Тестирование
-buttonExam.addEventListener("click", function() {
 
+
+
+// запуск режима экзамена
+function startExam() {
     studyCards.classList.add("hidden"); // скрываем режим обучения
     studyMode.classList.add("hidden"); // скрываем статистику study-mode
     examMode.classList.remove("hidden");
@@ -228,7 +230,12 @@ buttonExam.addEventListener("click", function() {
 
     timerId = setInterval(startTimer, 1000); // запуск таймера
     examWords = [];
+}
 
+
+// обработчик на кнопку Тестирование
+buttonExam.addEventListener("click", function() {
+    startExam();
 });
 
 
@@ -335,6 +342,10 @@ createButton("button-test", "Назад к тренировке", examMode); // 
 const buttonTest = document.querySelector("#button-test");
 
 
+createButton("button-test-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
+const buttonTestAgain = document.querySelector("#button-test-again");
+
+
 function resetExamMode() { // сброс режима экзамена
     clearTimeout(timerId);
     minutes = 0;
@@ -359,4 +370,9 @@ buttonTest.addEventListener("click", function() {
     studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
     studyCards.classList.remove("hidden"); // отобразить карточки в режиме тренировки
 
-})
+});
+
+buttonTestAgain.addEventListener("click", function() {
+    resetExamMode();
+    startExam();
+});
