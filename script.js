@@ -301,6 +301,9 @@ function checkExamWords(checkedWords) { // проверка слов
 
         }, 500);
 
+        buttonStudyAgain.disabled = true; // выкл.
+        buttonExamAgain.disabled = true;
+
         setTimeout(() => {
             resultsModal.classList.remove("hidden");
         }, 1000);
@@ -320,9 +323,14 @@ function showImg() { // картинка по завершению тестир�
     img.style.marginLeft = `${(screenWidth - imgWidth) / 2}px`;
     document.body.append(img);
 
+
     setTimeout(function() {
         img.style.display = "none";
-    }, 3000);
+        buttonStudyAgain.disabled = false; // вкл.
+        buttonExamAgain.disabled = false;
+
+    }, 1000);
+
 }
 
 // создание дополнительной кнопки
@@ -333,12 +341,12 @@ function createButton(buttonID, buttonText, container) {
     container.append(button);
 }
 
-createButton("button-test", "Назад к тренировке", examMode); // кнопка Назад к тренировке
-const buttonTest = document.querySelector("#button-test");
+createButton("button-study", "Назад к тренировке", examMode); // кнопка Назад к тренировке
+const buttonStudyAgain = document.querySelector("#button-study");
 
 
-createButton("button-test-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
-const buttonTestAgain = document.querySelector("#button-test-again");
+createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
+const buttonExamAgain = document.querySelector("#button-exam-again");
 
 
 function resetExamMode() { // сброс режима экзамена
@@ -359,7 +367,7 @@ function resetExamMode() { // сброс режима экзамена
 }
 
 
-buttonTest.addEventListener("click", function() {
+buttonStudyAgain.addEventListener("click", function() {
     resetExamMode();
 
     studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
@@ -367,7 +375,7 @@ buttonTest.addEventListener("click", function() {
 
 });
 
-buttonTestAgain.addEventListener("click", function() {
+buttonExamAgain.addEventListener("click", function() {
     resetExamMode();
     startExam();
 });
