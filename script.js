@@ -129,6 +129,7 @@ function blockButtons() {
 buttonNext.addEventListener("click", function() {
     nextCard();
     blockButtons();
+
 });
 
 
@@ -257,7 +258,7 @@ function updatePercent(data) { // обновление процента верн
 }
 
 // обновление вперед прогресс бара
-function updateNextProgressBar(name, data) { // прогресс бар вперед, параметр - id прогресса и процент верного ответа
+function updateNextProgressBar(name, data) { // параметр - id прогресса и процент верного ответа
     name.value = name.value + data;
 }
 
@@ -308,12 +309,12 @@ function checkExamWords(checkedWords) { // проверка слов
 function showImg() { // картинка по завершению тестирования
     const img = document.createElement("img");
     img.src = "https://svgsilh.com/svg/1531577-da2865.svg";
-    img.style.width = "200px";
+    img.style.width = "150px";
     img.style.height = "auto";
     img.style.position = "absolute";
     img.style.top = "30px";
     const screenWidth = window.innerWidth;
-    const imgWidth = 300;
+    const imgWidth = 220;
     img.style.marginLeft = `${(screenWidth - imgWidth) / 2}px`;
     document.body.append(img);
 
@@ -322,11 +323,16 @@ function showImg() { // картинка по завершению тестир�
     }, 3000);
 }
 
+// создание дополнительной кнопки
+function createButton(buttonID, buttonText, container) {
+    const button = document.createElement("button");
+    button.textContent = buttonText;
+    button.id = buttonID;
+    container.append(button);
+}
 
-// кнопка Назад к тренировке. Вернуться в режим тренировки, если не готов
-const buttonTest = document.createElement("button");
-buttonTest.textContent = "Назад к тренировке";
-examMode.append(buttonTest);
+createButton("button-test", "Назад к тренировке", examMode); // кнопка Назад к тренировке
+const buttonTest = document.querySelector("#button-test");
 
 
 function resetExamMode() { // сброс режима экзамена
