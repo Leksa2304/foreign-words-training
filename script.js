@@ -262,8 +262,6 @@ function checkExamWords(checkedWords) { // проверка слов
         checkedWords[1].classList.add("correct");
         ++correctWords;
 
-        // correctNumPercent = correctNumPercent + percentOneCard;
-        // correctPercent.textContent = `${correctNumPercent}%`;
         updatePercent(percentOneCard); // процент правильных ответов
         updateProgressBar(percentOneCard); // прогресс бар
 
@@ -285,7 +283,9 @@ function checkExamWords(checkedWords) { // проверка слов
 
 
         setTimeout(() => {
-            alert("Тестирование успешно пройдено!")
+            alert("Тестирование успешно пройдено!");
+            showImg();
+
         }, 500);
 
         setTimeout(() => {
@@ -295,6 +295,22 @@ function checkExamWords(checkedWords) { // проверка слов
     timer.textContent = `${time.textContent}`;
 };
 
+function showImg() { // картинка по завершению тестирования
+    const img = document.createElement("img");
+    img.src = "https://svgsilh.com/svg/1531577-da2865.svg";
+    img.style.width = "200px";
+    img.style.height = "auto";
+    img.style.position = "absolute";
+    img.style.top = "30px";
+    const screenWidth = window.innerWidth;
+    const imgWidth = 300;
+    img.style.marginLeft = `${(screenWidth - imgWidth) / 2}px`;
+    document.body.append(img);
+
+    setTimeout(function() {
+        img.style.display = "none";
+    }, 3000);
+}
 
 
 // кнопка Назад к тренировке. Вернуться в режим тренировки, если не готов
