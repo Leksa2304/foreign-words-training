@@ -24,6 +24,10 @@ const resultsModal = document.querySelector(".results-modal");
 const resultsContent = document.querySelector(".results-contenеt");
 const sliderControls = document.querySelector(".slider-controls");
 const content = document.querySelector("content");
+// прогресс бар
+const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
+const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
+
 
 
 const words = [
@@ -41,15 +45,25 @@ const words = [
 
 const maxWords = 5; // кол-во карточек для изучения
 
+
+// верные ответы и % верных слов
+const percent = 100;
+let correctWords = 0; // счетчик верных ответов
+let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
+let correctPercent = document.querySelector("#correct-percent");
+let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
+
+
 const copy = words.slice(); // создаем копию массива
 
-function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
 
+function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
     const index = Math.floor(Math.random() * arr.length);
     let obj = arr[index]; // получаем случайный объект
     arr.splice(index, 1); // удаляем полученный объект из копии массива, для дальнейшего генерирования неповторяющегося объекта
     return obj;
 };
+
 
 function showCard(card) { // функция создания карточки
     cardFront.innerHTML = `${card.word}`;
@@ -60,19 +74,22 @@ function showCard(card) { // функция создания карточки
 let wordsLearning = []; // массив слов для изучения
 
 for (let i = 0; i < maxWords; i++) {
-
     wordsLearning.push(getRandomWord(copy)); // добавление в массив слов для изучения
 }
 
+
 // отображение карточки
 let cardIndex = 0; // индекс объекта в массиве
+
 showCard(wordsLearning[cardIndex]);
+wordsProgress.value = percentOneCard;
 
 
 function nextCard() { // переход к следующей карточке
     if (cardIndex < (maxWords - 1)) {
         cardIndex = ++cardIndex;
         showCard(wordsLearning[cardIndex]);
+        updateNextProgressBar(wordsProgress, percentOneCard);
     }
 }
 
@@ -80,6 +97,7 @@ function backCard() { // переход к карточке назад
     if (cardIndex > 0) {
         cardIndex = --cardIndex;
         showCard(wordsLearning[cardIndex]);
+        updateBackProgressBar(wordsProgress, percentOneCard);
     }
 }
 
@@ -232,29 +250,21 @@ const template = document.querySelector("#word-stats"); // шаблон стат
 const copyTemplate = template.content.cloneNode(true); // копия шаблона
 resultsModal.append(copyTemplate);
 
-let correctWords = 0; // счетчик верных ответов
-
-
-// % верных слов
-const percent = 100;
-let percentOneCard = percent / maxWords; // процент верного ответа одной карточки
-let correctPercent = document.querySelector("#correct-percent");
-let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
-
-
-// прогресс бар
-const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
-const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
 
 function updatePercent(data) { // обновление процента верных ответов
     correctNumPercent = correctNumPercent + data;
     correctPercent.textContent = `${correctNumPercent}%`;
 }
 
-// обновление прогресс бара
-function updateProgressBar(data) { // параметр - процент верного ответа
-    examProgress.value = examProgress.value + data;
+// обновление вперед прогресс бара
+function updateNextProgressBar(name, data) { // прогресс бар вперед, параметр - id прогресса и процент верного ответа
+    name.value = name.value + data;
 }
+
+function updateBackProgressBar(name, data) { // прогресс бар назад
+    name.value = name.value - data;
+}
+
 
 function checkExamWords(checkedWords) { // проверка слов
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
@@ -263,7 +273,7 @@ function checkExamWords(checkedWords) { // проверка слов
         ++correctWords;
 
         updatePercent(percentOneCard); // процент правильных ответов
-        updateProgressBar(percentOneCard); // прогресс бар
+        updateNextProgressBar(examProgress, percentOneCard); // прогресс бар
 
 
         checkedWords[0].classList.add("fade-out");
