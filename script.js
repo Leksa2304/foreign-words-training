@@ -332,8 +332,21 @@ function showImg() { // картинка по завершению тестир�
     }, 1000);
 
 }
+// создание дополнительных кнопок
+function createButton(buttonID, buttonText, container) {
+    const button = document.createElement("button");
+    button.textContent = buttonText;
+    button.id = buttonID;
+    button.style.marginBottom = "10px";
+    container.append(button);
 
+}
+
+createButton("button-study-again", "Назад к тренировке", examMode); // кнопка Назад к тренировке
 const buttonStudyAgain = document.querySelector("#button-study-again");
+
+
+createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
 const buttonExamAgain = document.querySelector("#button-exam-again");
 
 function resetExamMode() { // сброс режима экзамена
