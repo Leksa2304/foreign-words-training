@@ -48,7 +48,7 @@ const maxWords = 5; // кол-во карточек для изучения
 const percent = 100;
 let correctWords = 0; // счетчик верных ответов
 const percentOneCard = percent / maxWords; // процент верного ответа одной карточки
-let correctPercent = document.querySelector("#correct-percent");
+const correctPercent = document.querySelector("#correct-percent");
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
 
 
@@ -57,7 +57,7 @@ const copy = words.slice(); // создаем копию массива
 
 function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
     const index = Math.floor(Math.random() * arr.length);
-    let obj = arr[index]; // получаем случайный объект
+    const obj = arr[index]; // получаем случайный объект
     arr.splice(index, 1); // удаляем полученный объект из копии массива, для дальнейшего генерирования неповторяющегося объекта
     return obj;
 };
@@ -69,7 +69,7 @@ function showCard(card) { // функция создания карточки
     spanExample.innerHTML = `${card.example}`;
 }
 
-let wordsLearning = []; // массив слов для изучения
+const wordsLearning = []; // массив слов для изучения
 
 for (let i = 0; i < maxWords; i++) {
     wordsLearning.push(getRandomWord(copy)); // добавление в массив слов для изучения
@@ -333,23 +333,8 @@ function showImg() { // картинка по завершению тестир�
 
 }
 
-// создание дополнительной кнопки
-function createButton(buttonID, buttonText, container) {
-    const button = document.createElement("button");
-    button.textContent = buttonText;
-    button.id = buttonID;
-    button.style.marginBottom = "10px";
-    container.append(button);
-
-}
-
-createButton("button-study", "Назад к тренировке", examMode); // кнопка Назад к тренировке
-const buttonStudyAgain = document.querySelector("#button-study");
-
-
-createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
+const buttonStudyAgain = document.querySelector("#button-study-again");
 const buttonExamAgain = document.querySelector("#button-exam-again");
-
 
 function resetExamMode() { // сброс режима экзамена
     clearTimeout(timerId);
