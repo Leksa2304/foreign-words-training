@@ -27,6 +27,7 @@ const content = document.querySelector("content");
 // прогресс бар
 const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
+const motivation = document.querySelector(".motivation");
 
 const words = [
     { word: "dog", translation: "собака", example: "Dogs don't like cats" },
@@ -236,7 +237,13 @@ buttonExam.addEventListener("click", function() {
 
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
+
     const element = event.target.closest("div");
+
+    if (element.classList.contains("fade-out")) {
+        return;
+    }
+
     examWords.push(element); // добавлять кликнутую карточку в массив двух карточек
 
     if (examWords.length === 1) { // это первая карточка
@@ -311,27 +318,26 @@ function checkExamWords(checkedWords) { // проверка слов
     timer.textContent = `${time.textContent}`;
 };
 
+
+
 function showImg() { // картинка по завершению тестирования
+
     const img = document.createElement("img");
-    img.src = "https://svgsilh.com/svg/1531577-da2865.svg";
+
+    img.src = "https://svgsilh.com/svg/1431380-e91e63.svg";
     img.style.width = "150px";
     img.style.height = "auto";
-    img.style.position = "absolute";
-    img.style.top = "30px";
-    const screenWidth = window.innerWidth;
-    const imgWidth = 220;
-    img.style.marginLeft = `${(screenWidth - imgWidth) / 2}px`;
-    document.body.append(img);
+    img.style.marginTop = "175px";
+    img.style.display = "block";
 
+    motivation.append(img);
 
-    setTimeout(function() {
-        img.style.display = "none";
-        buttonStudyAgain.disabled = false; // вкл.
-        buttonExamAgain.disabled = false;
-
-    }, 1000);
+    buttonStudyAgain.disabled = false; // вкл.
+    buttonExamAgain.disabled = false;
 
 }
+
+
 // создание дополнительных кнопок
 function createButton(buttonID, buttonText, container) {
     const button = document.createElement("button");
