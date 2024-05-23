@@ -262,3 +262,9 @@ progress {
         opacity: 0;
     }
 }
+
+.img-victory {
+    width: 150px;
+    height: auto;
+    margin-top: 80px;
+}

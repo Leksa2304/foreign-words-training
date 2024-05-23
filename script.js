@@ -27,7 +27,8 @@ const content = document.querySelector("content");
 // прогресс бар
 const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
-const motivation = document.querySelector(".motivation");
+const imgMotivation = document.querySelector(".img-motivation");
+
 
 const words = [
     { word: "dog", translation: "собака", example: "Dogs don't like cats" },
@@ -301,41 +302,30 @@ function checkExamWords(checkedWords) { // проверка слов
     if (correctWords === maxWords) { // проверка на все отвеченные слова
         clearTimeout(timerId); // остановка таймера
 
-
         setTimeout(() => {
             alert("Тестирование успешно пройдено!");
-            showImg();
 
-        }, 500);
+            buttonStudyAgain.disabled = true; // выкл.
+            buttonExamAgain.disabled = true;
+            imgMotivation.classList.remove("hidden");
 
-        buttonStudyAgain.disabled = true; // выкл.
-        buttonExamAgain.disabled = true;
+        }, 1000);
+
+        setTimeout(() => {
+
+            imgMotivation.classList.add("hidden");
+            buttonStudyAgain.disabled = false; // вкл.
+            buttonExamAgain.disabled = false;
+
+        }, 5000);
 
         setTimeout(() => {
             resultsModal.classList.remove("hidden");
         }, 1000);
+
     }
     timer.textContent = `${time.textContent}`;
 };
-
-
-
-function showImg() { // картинка по завершению тестирования
-
-    const img = document.createElement("img");
-
-    img.src = "https://svgsilh.com/svg/1431380-e91e63.svg";
-    img.style.width = "150px";
-    img.style.height = "auto";
-    img.style.marginTop = "175px";
-    img.style.display = "block";
-
-    motivation.append(img);
-
-    buttonStudyAgain.disabled = false; // вкл.
-    buttonExamAgain.disabled = false;
-
-}
 
 
 // создание дополнительных кнопок
@@ -352,7 +342,7 @@ createButton("button-study-again", "Назад к тренировке", examMod
 const buttonStudyAgain = document.querySelector("#button-study-again");
 
 
-createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Назад к тренировке
+createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Перезапустить экзамен
 const buttonExamAgain = document.querySelector("#button-exam-again");
 
 function resetExamMode() { // сброс режима экзамена
@@ -370,10 +360,12 @@ function resetExamMode() { // сброс режима экзамена
 
     examMode.classList.add("hidden"); // скрываем статистику exam
     resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
+
 }
 
 
 buttonStudyAgain.addEventListener("click", function() {
+
     resetExamMode();
 
     studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
@@ -382,6 +374,7 @@ buttonStudyAgain.addEventListener("click", function() {
 });
 
 buttonExamAgain.addEventListener("click", function() {
+
     resetExamMode();
     startExam();
 });
