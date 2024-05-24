@@ -23,7 +23,7 @@ const timer = document.querySelector("#timer");
 const resultsModal = document.querySelector(".results-modal");
 const resultsContent = document.querySelector(".results-contenеt");
 const sliderControls = document.querySelector(".slider-controls");
-const content = document.querySelector("content");
+//const content = document.querySelector("content");
 // прогресс бар
 const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
@@ -45,7 +45,6 @@ const words = [
 
 const maxWords = 5; // кол-во карточек для изучения
 
-
 // верные ответы и % верных слов
 const percent = 100;
 let correctWords = 0; // счетчик верных ответов
@@ -55,7 +54,6 @@ let correctNumPercent = parseInt(document.querySelector("#correct-percent").text
 
 
 const copy = words.slice(); // создаем копию массива
-
 
 function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
     const index = Math.floor(Math.random() * arr.length);
@@ -148,12 +146,13 @@ shuffleWords.addEventListener("click", function() {
 // Режим тестированиия - проверки знаний
 
 // создание карточки в режиме тестирования
-function createExamCard(text, otherText) { // obj - объект массива
+function createExamCard(text, otherText, specialText) { // obj - объект массива
     const card = document.createElement("div");
     card.classList.add("card");
     card.setAttribute("word", text);
     card.setAttribute("translation", otherText);
-
+    /////
+    card.setAttribute("specialWord", specialText);
 
     const cardWord = document.createElement("p");
     cardWord.textContent = text;
@@ -178,8 +177,10 @@ function renderExamCards() {
     const fragment = new DocumentFragment();
     const arrForExam = []; // создаем массив для перемешивания слов при тестировании
     wordsLearning.forEach((obj) => {
-        const engWord = createExamCard(obj.word, obj.translation);
-        const ruWord = createExamCard(obj.translation, obj.word);
+        const engWord = createExamCard(obj.word, obj.translation, obj.word);
+        const ruWord = createExamCard(obj.translation, obj.word, obj.word);
+
+
 
         arrForExam.push(engWord, ruWord);
     });
@@ -236,9 +237,34 @@ buttonExam.addEventListener("click", function() {
 });
 
 
+// создание статистики
+const template = document.querySelector("#word-stats"); // шаблон статистики ответов
+const copyTemplate = template.content.cloneNode(true); // копия шаблона
+resultsModal.append(copyTemplate);
+
+let attempts = 0;
+let wordStat;
+
+function createWordStat(arr) {
+    // const template = document.querySelector("#word-stats"); // шаблон статистики ответов
+    // const copyTemplate = template.content.cloneNode(true); // копия шаблона
+    // resultsModal.append(copyTemplate);
+
+    const spanWord = copyTemplate.querySelector("p.word span");
+    const spanAttempts = copyTemplate.querySelector("p.attempts span");
+
+    wordStat = arr[0].getAttribute("specialWord");
+    spanWord.textContent = wordStat;
+    spanAttempts.textContent = attempts;
+
+    return copyTemplate;
+}
+
+
+
+
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
-
     const element = event.target.closest("div");
 
     if (element.classList.contains("fade-out")) {
@@ -247,19 +273,27 @@ examCardsContainer.addEventListener("click", function(event) {
 
     examWords.push(element); // добавлять кликнутую карточку в массив двух карточек
 
+    ++attempts;
+
+
+
     if (examWords.length === 1) { // это первая карточка
         element.classList.add("correct");
+
+        //  createWordStat(examWords);
+        /////////////////////////////////////////
+        // const result = words.filter(item => item.word === examWords[0].textContent || item.translation === examWords[0].textContent);
+        // result.find(function(item) {
+        //     return console.log(item.word);
+        // }); // слово в статистику
+
     }
     if (examWords.length === 2) { // это две карточки
         checkExamWords(examWords);
+
         examWords = [];
     }
 });
-
-// создание статистики
-const template = document.querySelector("#word-stats"); // шаблон статистики ответов
-const copyTemplate = template.content.cloneNode(true); // копия шаблона
-resultsModal.append(copyTemplate);
 
 
 function updatePercent(data) { // обновление процента верных ответов
@@ -278,10 +312,12 @@ function updateBackProgressBar(name, data) { // прогресс бар наза
 
 
 function checkExamWords(checkedWords) { // проверка слов
+
     if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
 
         checkedWords[1].classList.add("correct");
         ++correctWords;
+
 
         updatePercent(percentOneCard); // процент правильных ответов
         updateNextProgressBar(examProgress, percentOneCard); // прогресс бар
@@ -297,6 +333,7 @@ function checkExamWords(checkedWords) { // проверка слов
             checkedWords[0].classList.remove("correct");
             checkedWords[1].classList.remove("wrong");
         }, 500);
+
     }
 
     if (correctWords === maxWords) { // проверка на все отвеченные слова
@@ -324,7 +361,9 @@ function checkExamWords(checkedWords) { // проверка слов
         }, 1000);
 
     }
+
     timer.textContent = `${time.textContent}`;
+
 };
 
 
