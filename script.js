@@ -21,11 +21,10 @@ const studyCards = document.querySelector(".study-cards");
 const time = document.querySelector("#time");
 const timer = document.querySelector("#timer");
 const resultsModal = document.querySelector(".results-modal");
-const resultsContent = document.querySelector(".results-contenеt");
 const sliderControls = document.querySelector(".slider-controls");
 
 // прогресс бар
-const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
+const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме тестирования
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
 const imgMotivation = document.querySelector(".img-motivation");
 
@@ -45,19 +44,38 @@ const words = [
 
 const maxWords = 5; // кол-во карточек для изучения
 
+const copy = words.slice(); // копия массива
+
+// отображение карточки
+let cardIndex = 0; // индекс объекта в массиве
+
+const wordsLearning = []; // массив слов для изучения
+
+let examWords = []; // массив для двух карточек для сравнения
+
+// таймер
+let timerId;
+let seconds = 0;
+let minutes = 0;
+
+
 // верные ответы и % верных слов
 const percent = 100;
 let correctWords = 0; // счетчик верных ответов
 const percentOneCard = percent / maxWords; // процент верного ответа одной карточки
 const correctPercent = document.querySelector("#correct-percent");
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
+wordsProgress.value = percentOneCard;
 
-const copy = words.slice(); // создаем копию массива
 
-// таймер
-let timerId;
-let seconds = 0;
-let minutes = 0;
+
+// статистика
+const template = document.querySelector("#word-stats"); // шаблон статистики ответов
+
+const wordStatsObj = new Map(); // map для добавления подсчета статистики попыток правильных/неправильных слов
+let attempts = 0; // попытки для статистики
+
+
 
 function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
     const index = Math.floor(Math.random() * arr.length);
@@ -72,19 +90,6 @@ function showCard(card) { // функция создания карточки
     cardBack.innerHTML = `${card.translation}`;
     spanExample.innerHTML = `${card.example}`;
 }
-
-const wordsLearning = []; // массив слов для изучения
-
-for (let i = 0; i < maxWords; i++) {
-    wordsLearning.push(getRandomWord(copy)); // добавление в массив слов для изучения
-}
-
-
-// отображение карточки
-let cardIndex = 0; // индекс объекта в массиве
-
-showCard(wordsLearning[cardIndex]);
-wordsProgress.value = percentOneCard;
 
 
 function goToNextCard() { // переход к следующей карточке
@@ -101,6 +106,15 @@ function goToBackCard() { // переход к карточке назад
         showCard(wordsLearning[cardIndex]);
         updateBackProgressBar(wordsProgress, percentOneCard);
     }
+}
+
+// функция для перемешивания элементов массива 
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let n = Math.floor(Math.random() * (i + 1));
+        [array[i], array[n]] = [array[n], array[i]];
+    }
+    return array;
 }
 
 // функция блокировки кнопок
@@ -121,6 +135,208 @@ function blockButtons() {
         buttonNext.disabled = false; // вкл.
     }
 }
+
+
+//////////////////////////////////////////////////// Режим тестированиия - Экзамена
+
+// создание карточки в режиме тестирования
+function createExamCard(text, otherText, specialText) { // obj - объект массива
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.setAttribute("word", text);
+    card.setAttribute("translation", otherText);
+
+    card.setAttribute("specialWord", specialText);
+
+    const cardWord = document.createElement("p");
+    cardWord.textContent = text;
+    card.append(cardWord);
+    return card;
+}
+
+
+// вставка карточек
+function renderExamCards() {
+
+    const fragment = new DocumentFragment();
+    const arrForExam = []; // создаем массив для перемешивания слов при тестировании
+    wordsLearning.forEach((obj) => {
+        const engWord = createExamCard(obj.word, obj.translation, obj.word);
+        const ruWord = createExamCard(obj.translation, obj.word, obj.word);
+
+        arrForExam.push(engWord, ruWord);
+    });
+
+    shuffle(arrForExam);
+    fragment.append(...arrForExam);
+    examCardsContainer.innerHTML = "";
+    examCardsContainer.append(fragment);
+}
+
+
+function startTimer() { //функция таймера
+
+    seconds++;
+
+    if (seconds === 59) {
+        minutes++;
+        seconds = 0;
+    }
+
+    time.textContent = `${format(minutes)}:${format(seconds)}`;
+}
+
+function format(val) { //добавление незначащих нулей
+    if (val < 10) {
+        return `0${val}`
+    }
+    return val;
+}
+
+// запуск режима Тестирования-экзамена
+function startExam() {
+    studyCards.classList.add("hidden"); // скрываем режим обучения
+    studyMode.classList.add("hidden"); // скрываем статистику study-mode
+    examMode.classList.remove("hidden");
+    renderExamCards();
+
+    timerId = setInterval(startTimer, 1000); // запуск таймера
+    examWords = [];
+    wordStatsObj.clear();
+
+}
+
+function resetExamMode() { // сброс режима экзамена
+    clearTimeout(timerId);
+    minutes = 0;
+    seconds = 0;
+    time.textContent = "";
+    time.textContent = `${format(minutes)}:${format(seconds)}`;
+    examCardsContainer.innerHTML = "";
+    examWords = [];
+    correctWords = 0;
+    correctNumPercent = 0;
+    examProgress.value = 0;
+    correctPercent.textContent = `${correctNumPercent}%`;
+
+    examMode.classList.add("hidden"); // скрываем статистику exam
+    resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
+    wordStatsObj.clear();
+
+}
+
+
+function updatePercent(data) { // обновление процента верных ответов
+    correctNumPercent = correctNumPercent + data;
+    correctPercent.textContent = `${correctNumPercent}%`;
+}
+
+// обновление вперед прогресс бара
+function updateNextProgressBar(name, data) { // параметр - id прогресса и процент верного ответа
+    name.value = name.value + data;
+}
+
+// обновление назад прогресс бара
+function updateBackProgressBar(name, data) {
+    name.value = name.value - data;
+}
+
+
+function checkExamWords(selectedCards) { // проверка слов
+
+    if (selectedCards[0].getAttribute("word") === selectedCards[1].getAttribute("translation")) {
+
+        selectedCards[1].classList.add("correct");
+        ++correctWords;
+
+
+        updatePercent(percentOneCard); // процент правильных ответов
+        updateNextProgressBar(examProgress, percentOneCard); // прогресс бар
+
+
+        selectedCards[0].classList.add("fade-out");
+        selectedCards[1].classList.add("fade-out");
+
+    } else {
+        selectedCards[1].classList.add("wrong");
+
+        setTimeout(function() {
+            selectedCards[0].classList.remove("correct");
+            selectedCards[1].classList.remove("wrong");
+        }, 500);
+
+    }
+
+    if (correctWords === maxWords) { // проверка на все отвеченные слова
+        clearTimeout(timerId); // остановка таймера
+
+        completeExam();
+    };
+    timer.textContent = `${time.textContent}`;
+}
+
+// завершение экзамена
+function completeExam() {
+    setTimeout(() => {
+        alert("Тестирование успешно пройдено!");
+
+        imgMotivation.classList.remove("hidden");
+
+    }, 1000);
+
+    setTimeout(() => {
+
+        imgMotivation.classList.add("hidden");
+
+
+    }, 5000);
+
+    setTimeout(() => {
+        resultsModal.classList.remove("hidden");
+    }, 1000);
+
+}
+
+
+// создание дополнительных кнопок
+function createButton(buttonID, buttonText, container) {
+    const button = document.createElement("button");
+    button.textContent = buttonText;
+    button.id = buttonID;
+    button.style.marginBottom = "10px";
+    container.append(button);
+
+}
+
+// Статистика слов и попыток
+function updateStats(obj) {
+
+    const resultsContent = document.querySelector(".results-content");
+
+    const wordsStats = resultsModal.querySelectorAll(".word-stats");
+    wordsStats.forEach(element => element.remove());
+    obj.forEach((attempts, wordStats) => {
+
+
+        const copyTemplate = template.content.cloneNode(true); // копия шаблона
+
+        const spanWord = copyTemplate.querySelector(".word span");
+        const spanAttempts = copyTemplate.querySelector(".attempts span");
+
+        spanWord.textContent = wordStats;
+        spanAttempts.textContent = attempts;
+
+        resultsContent.append(copyTemplate);
+    });
+
+}
+
+//////////////////////////////////////////////////////////////////////////////// Режим тренировки
+for (let i = 0; i < maxWords; i++) {
+    wordsLearning.push(getRandomWord(copy)); // добавление в массив слов для изучения
+}
+
+showCard(wordsLearning[cardIndex]);
 
 
 // обработчик на click по карточке
@@ -149,129 +365,15 @@ shuffleWords.addEventListener("click", function() {
     showCard(wordsLearning[cardIndex]);
 })
 
-// Режим тестированиия - проверки знаний
-
-// создание карточки в режиме тестирования
-function createExamCard(text, otherText, specialText) { // obj - объект массива
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.setAttribute("word", text);
-    card.setAttribute("translation", otherText);
-
-    card.setAttribute("specialWord", specialText);
-
-    const cardWord = document.createElement("p");
-    cardWord.textContent = text;
-    card.append(cardWord);
-    return card;
-}
 
 
-// функция для перемешивания элементов массива 
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let n = Math.floor(Math.random() * (i + 1));
-        [array[i], array[n]] = [array[n], array[i]];
-    }
-    return array;
-}
-
-
-// вставка карточек
-function renderExamCards() {
-
-    const fragment = new DocumentFragment();
-    const arrForExam = []; // создаем массив для перемешивания слов при тестировании
-    wordsLearning.forEach((obj) => {
-        const engWord = createExamCard(obj.word, obj.translation, obj.word);
-        const ruWord = createExamCard(obj.translation, obj.word, obj.word);
-
-
-
-        arrForExam.push(engWord, ruWord);
-    });
-
-    shuffle(arrForExam);
-    fragment.append(...arrForExam);
-    examCardsContainer.innerHTML = "";
-    examCardsContainer.append(fragment);
-}
-
-
-
-function startTimer() { //функция таймера
-
-    seconds++;
-
-    if (seconds === 59) {
-        minutes++;
-        seconds = 0;
-    }
-
-    time.textContent = `${format(minutes)}:${format(seconds)}`;
-}
-
-//добавление незначащих нулей
-function format(val) {
-    if (val < 10) {
-        return `0${val}`
-    }
-    return val;
-}
-
-let examWords = []; // массив для двух карточек для сравнения
-
-
-// запуск режима Тестирования-экзамена
-function startExam() {
-    studyCards.classList.add("hidden"); // скрываем режим обучения
-    studyMode.classList.add("hidden"); // скрываем статистику study-mode
-    examMode.classList.remove("hidden");
-    renderExamCards();
-
-    timerId = setInterval(startTimer, 1000); // запуск таймера
-    examWords = [];
-    wordStatsObj.clear();
-
-}
-
-
+////////////////////////////////////////////////////////////////////////// Режим тестированиия - Экзамена
 // обработчик на кнопку Тестирование
 buttonExam.addEventListener("click", function() {
+
     startExam();
 });
 
-
-// создание статистики
-const template = document.querySelector("#word-stats"); // шаблон статистики ответов
-
-
-function updateStats(obj) {
-
-    const resultsModal = document.querySelector(".results-modal");
-
-    const wordsStats = resultsModal.querySelectorAll(".word-stats");
-    wordsStats.forEach(element => element.remove());
-    obj.forEach((attempts, wordStats) => {
-
-
-        const copyTemplate = template.content.cloneNode(true); // копия шаблона
-
-        const spanWord = copyTemplate.querySelector(".word span");
-        const spanAttempts = copyTemplate.querySelector(".attempts span");
-
-        spanWord.textContent = wordStats;
-        spanAttempts.textContent = attempts;
-
-        resultsModal.append(copyTemplate);
-    });
-
-}
-/////////////////////////////
-const wordStatsObj = new Map();
-let attempts = 0;
-
-// const arrStats = []; // массив для добавления подсчета статистики попыток правильных/неправильных слов 
 
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
@@ -288,7 +390,6 @@ examCardsContainer.addEventListener("click", function(event) {
         element.classList.add("correct");
 
         /////////////////////подсчет слов
-
 
         const wordStats = element.getAttribute("specialWord");
 
@@ -314,114 +415,8 @@ examCardsContainer.addEventListener("click", function(event) {
 });
 
 
-function updatePercent(data) { // обновление процента верных ответов
-    correctNumPercent = correctNumPercent + data;
-    correctPercent.textContent = `${correctNumPercent}%`;
-}
-
-// обновление вперед прогресс бара
-function updateNextProgressBar(name, data) { // параметр - id прогресса и процент верного ответа
-    name.value = name.value + data;
-}
-
-function updateBackProgressBar(name, data) { // прогресс бар назад
-    name.value = name.value - data;
-}
-
-
-function checkExamWords(checkedWords) { // проверка слов
-
-    if (checkedWords[0].getAttribute("word") === checkedWords[1].getAttribute("translation")) {
-
-        checkedWords[1].classList.add("correct");
-        ++correctWords;
-
-
-        updatePercent(percentOneCard); // процент правильных ответов
-        updateNextProgressBar(examProgress, percentOneCard); // прогресс бар
-
-
-        checkedWords[0].classList.add("fade-out");
-        checkedWords[1].classList.add("fade-out");
-
-    } else {
-        checkedWords[1].classList.add("wrong");
-
-        setTimeout(function() {
-            checkedWords[0].classList.remove("correct");
-            checkedWords[1].classList.remove("wrong");
-        }, 500);
-
-    }
-
-    if (correctWords === maxWords) { // проверка на все отвеченные слова
-        clearTimeout(timerId); // остановка таймера
-
-        setTimeout(() => {
-            alert("Тестирование успешно пройдено!");
-
-            buttonStudyAgain.disabled = true; // выкл.
-            buttonExamAgain.disabled = true;
-            imgMotivation.classList.remove("hidden");
-
-        }, 1000);
-
-        setTimeout(() => {
-
-            imgMotivation.classList.add("hidden");
-            buttonStudyAgain.disabled = false; // вкл.
-            buttonExamAgain.disabled = false;
-
-        }, 5000);
-
-        setTimeout(() => {
-            resultsModal.classList.remove("hidden");
-        }, 1000);
-
-    }
-
-    timer.textContent = `${time.textContent}`;
-
-};
-
-
-// создание дополнительных кнопок
-function createButton(buttonID, buttonText, container) {
-    const button = document.createElement("button");
-    button.textContent = buttonText;
-    button.id = buttonID;
-    button.style.marginBottom = "10px";
-    container.append(button);
-
-}
-
-createButton("button-study-again", "Назад к тренировке", examMode); // кнопка Назад к тренировке
+createButton("button-study-again", "Назад к тренировке", examMode); // создание кнопки Назад к тренировке
 const buttonStudyAgain = document.querySelector("#button-study-again");
-
-
-createButton("button-exam-again", "Перезапустить экзамен", examMode); // кнопка Перезапустить экзамен
-const buttonExamAgain = document.querySelector("#button-exam-again");
-
-function resetExamMode() { // сброс режима экзамена
-    clearTimeout(timerId);
-    minutes = 0;
-    seconds = 0;
-    time.textContent = "";
-    time.textContent = `${format(minutes)}:${format(seconds)}`;
-    examCardsContainer.innerHTML = "";
-    examWords = [];
-    correctWords = 0;
-    correctNumPercent = 0;
-    examProgress.value = 0;
-    correctPercent.textContent = `${correctNumPercent}%`;
-
-    examMode.classList.add("hidden"); // скрываем статистику exam
-    resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
-    wordStatsObj.clear();
-
-
-}
-
 
 buttonStudyAgain.addEventListener("click", function() {
 
@@ -429,8 +424,15 @@ buttonStudyAgain.addEventListener("click", function() {
 
     studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
     studyCards.classList.remove("hidden"); // отобразить карточки в режиме тренировки
+    wordsProgress.value = percentOneCard;
+    cardIndex = 0;
+    currentWord.textContent = 1;
 
 });
+
+
+createButton("button-exam-again", "Перезапустить экзамен", examMode); // создание кнопки Перезапустить экзамен
+const buttonExamAgain = document.querySelector("#button-exam-again");
 
 buttonExamAgain.addEventListener("click", function() {
 
