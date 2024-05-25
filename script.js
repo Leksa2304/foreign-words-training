@@ -23,7 +23,7 @@ const timer = document.querySelector("#timer");
 const resultsModal = document.querySelector(".results-modal");
 const resultsContent = document.querySelector(".results-contenеt");
 const sliderControls = document.querySelector(".slider-controls");
-//const content = document.querySelector("content");
+
 // прогресс бар
 const wordsProgress = document.querySelector("#words-progress"); // прогресс бар в режиме экзамен
 const examProgress = document.querySelector("#exam-progress"); // прогресс бар в режиме экзамен
@@ -52,8 +52,12 @@ const percentOneCard = percent / maxWords; // процент верного от
 const correctPercent = document.querySelector("#correct-percent");
 let correctNumPercent = parseInt(document.querySelector("#correct-percent").textContent);
 
-
 const copy = words.slice(); // создаем копию массива
+
+// таймер
+let timerId;
+let seconds = 0;
+let minutes = 0;
 
 function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
     const index = Math.floor(Math.random() * arr.length);
@@ -99,11 +103,6 @@ function goToBackCard() { // переход к карточке назад
     }
 }
 
-// обработчик на click по карточке
-slider.addEventListener("click", function() {
-    flipCard.classList.toggle("active");
-});
-
 // функция блокировки кнопок
 function blockButtons() {
     currentWord.textContent = cardIndex + 1;
@@ -122,6 +121,13 @@ function blockButtons() {
         buttonNext.disabled = false; // вкл.
     }
 }
+
+
+// обработчик на click по карточке
+slider.addEventListener("click", function() {
+    flipCard.classList.toggle("active");
+});
+
 
 // обработчик на стрелку вперед
 buttonNext.addEventListener("click", function() {
@@ -191,10 +197,7 @@ function renderExamCards() {
     examCardsContainer.append(fragment);
 }
 
-// таймер
-let timerId;
-let seconds = 0;
-let minutes = 0;
+
 
 function startTimer() { //функция таймера
 
@@ -228,6 +231,8 @@ function startExam() {
 
     timerId = setInterval(startTimer, 1000); // запуск таймера
     examWords = [];
+    wordStatsObj.clear();
+
 }
 
 
@@ -240,23 +245,33 @@ buttonExam.addEventListener("click", function() {
 // создание статистики
 const template = document.querySelector("#word-stats"); // шаблон статистики ответов
 
-function updateStats(arr) {
 
-    const copyTemplate = template.content.cloneNode(true); // копия шаблона
-    const spanWord = copyTemplate.querySelector(".word span");
-    const spanAttempts = copyTemplate.querySelector(".attempts span");
+function updateStats(obj) {
+
+    const resultsModal = document.querySelector(".results-modal");
+
+    const wordsStats = resultsModal.querySelectorAll(".word-stats");
+    wordsStats.forEach(element => element.remove());
+    obj.forEach((attempts, wordStats) => {
 
 
-    arr.forEach(word => {
+        const copyTemplate = template.content.cloneNode(true); // копия шаблона
 
-        spanWord.textContent = word;
-        spanAttempts.textContent = 0;
+        const spanWord = copyTemplate.querySelector(".word span");
+        const spanAttempts = copyTemplate.querySelector(".attempts span");
+
+        spanWord.textContent = wordStats;
+        spanAttempts.textContent = attempts;
+
         resultsModal.append(copyTemplate);
     });
 
 }
+/////////////////////////////
+const wordStatsObj = new Map();
+let attempts = 0;
 
-const arrStats = []; // объект для добавления подсчета статистики попыток правильных/неправильных слов 
+// const arrStats = []; // массив для добавления подсчета статистики попыток правильных/неправильных слов 
 
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
@@ -272,19 +287,22 @@ examCardsContainer.addEventListener("click", function(event) {
     if (examWords.length === 1) { // это первая карточка
         element.classList.add("correct");
 
-
         /////////////////////подсчет слов
+
+
         const wordStats = element.getAttribute("specialWord");
 
 
+        if (wordStatsObj.has(wordStats)) {
 
-        if (!arrStats.includes(wordStats)) {
-            arrStats.push(wordStats);
+            wordStatsObj.set(wordStats, wordStatsObj.get(wordStats) + 1);
 
+        } else {
 
-            updateStats(arrStats);
-
+            wordStatsObj.set(wordStats, 1);
         }
+
+        updateStats(wordStatsObj);
     }
 
 
@@ -399,6 +417,8 @@ function resetExamMode() { // сброс режима экзамена
 
     examMode.classList.add("hidden"); // скрываем статистику exam
     resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
+    wordStatsObj.clear();
+
 
 }
 
