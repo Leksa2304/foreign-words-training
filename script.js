@@ -151,7 +151,7 @@ function createExamCard(text, otherText, specialText) { // obj - объект м
     card.classList.add("card");
     card.setAttribute("word", text);
     card.setAttribute("translation", otherText);
-    /////
+
     card.setAttribute("specialWord", specialText);
 
     const cardWord = document.createElement("p");
@@ -239,29 +239,24 @@ buttonExam.addEventListener("click", function() {
 
 // создание статистики
 const template = document.querySelector("#word-stats"); // шаблон статистики ответов
-const copyTemplate = template.content.cloneNode(true); // копия шаблона
-resultsModal.append(copyTemplate);
 
-let attempts = 0;
-let wordStat;
+function updateStats(arr) {
 
-function createWordStat(arr) {
-    // const template = document.querySelector("#word-stats"); // шаблон статистики ответов
-    // const copyTemplate = template.content.cloneNode(true); // копия шаблона
-    // resultsModal.append(copyTemplate);
+    const copyTemplate = template.content.cloneNode(true); // копия шаблона
+    const spanWord = copyTemplate.querySelector(".word span");
+    const spanAttempts = copyTemplate.querySelector(".attempts span");
 
-    const spanWord = copyTemplate.querySelector("p.word span");
-    const spanAttempts = copyTemplate.querySelector("p.attempts span");
 
-    wordStat = arr[0].getAttribute("specialWord");
-    spanWord.textContent = wordStat;
-    spanAttempts.textContent = attempts;
+    arr.forEach(word => {
 
-    return copyTemplate;
+        spanWord.textContent = word;
+        spanAttempts.textContent = 0;
+        resultsModal.append(copyTemplate);
+    });
+
 }
 
-
-
+const arrStats = []; // объект для добавления подсчета статистики попыток правильных/неправильных слов 
 
 // обработчик на click по первой карточке
 examCardsContainer.addEventListener("click", function(event) {
@@ -273,21 +268,26 @@ examCardsContainer.addEventListener("click", function(event) {
 
     examWords.push(element); // добавлять кликнутую карточку в массив двух карточек
 
-    ++attempts;
-
-
 
     if (examWords.length === 1) { // это первая карточка
         element.classList.add("correct");
 
-        //  createWordStat(examWords);
-        /////////////////////////////////////////
-        // const result = words.filter(item => item.word === examWords[0].textContent || item.translation === examWords[0].textContent);
-        // result.find(function(item) {
-        //     return console.log(item.word);
-        // }); // слово в статистику
 
+        /////////////////////подсчет слов
+        const wordStats = element.getAttribute("specialWord");
+
+
+
+        if (!arrStats.includes(wordStats)) {
+            arrStats.push(wordStats);
+
+
+            updateStats(arrStats);
+
+        }
     }
+
+
     if (examWords.length === 2) { // это две карточки
         checkExamWords(examWords);
 
