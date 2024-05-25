@@ -68,13 +68,11 @@ let correctNumPercent = parseInt(document.querySelector("#correct-percent").text
 wordsProgress.value = percentOneCard;
 
 
-
 // статистика
 const template = document.querySelector("#word-stats"); // шаблон статистики ответов
 
 const wordStatsObj = new Map(); // map для добавления подсчета статистики попыток правильных/неправильных слов
 let attempts = 0; // попытки для статистики
-
 
 
 function getRandomWord(arr) { // функция для генерации карточки (случайного объекта из массива)
@@ -121,19 +119,8 @@ function shuffle(array) {
 function blockButtons() {
     currentWord.textContent = cardIndex + 1;
 
-    if (cardIndex === (maxWords - 1)) {
-        buttonNext.disabled = true; // выкл.
-    }
-    if (cardIndex < (maxWords - 1)) {
-        buttonNext.disabled = false; // вкл.
-    }
-    if (cardIndex > 0) {
-        buttonBack.disabled = false; // вкл.
-    }
-    if (cardIndex === 0) {
-        buttonBack.disabled = true; // выкл.
-        buttonNext.disabled = false; // вкл.
-    }
+    buttonNext.disabled = (cardIndex === (maxWords - 1)) ? true : false;
+    buttonBack.disabled = (cardIndex === 0) ? true : false;
 }
 
 
@@ -193,24 +180,34 @@ function format(val) { //добавление незначащих нулей
     return val;
 }
 
+function removeVisibilityClass(element) { // удаление невидимости элемента
+    element.classList.remove("hidden");
+}
+
+function addVisibilityClass(element) { // добавление невидимости элемента
+    element.classList.add("hidden");
+}
+
+
 // запуск режима Тестирования-экзамена
 function startExam() {
-    studyCards.classList.add("hidden"); // скрываем режим обучения
-    studyMode.classList.add("hidden"); // скрываем статистику study-mode
-    examMode.classList.remove("hidden");
+
+    addVisibilityClass(studyCards); // скрываем режим обучения
+
+    addVisibilityClass(studyMode); // скрываем статистику study-mode
+    removeVisibilityClass(examMode);
+
     renderExamCards();
 
     timerId = setInterval(startTimer, 1000); // запуск таймера
     examWords = [];
     wordStatsObj.clear();
-
 }
 
 function resetExamMode() { // сброс режима экзамена
     clearTimeout(timerId);
     minutes = 0;
     seconds = 0;
-    time.textContent = "";
     time.textContent = `${format(minutes)}:${format(seconds)}`;
     examCardsContainer.innerHTML = "";
     examWords = [];
@@ -218,9 +215,8 @@ function resetExamMode() { // сброс режима экзамена
     correctNumPercent = 0;
     examProgress.value = 0;
     correctPercent.textContent = `${correctNumPercent}%`;
-
-    examMode.classList.add("hidden"); // скрываем статистику exam
-    resultsModal.classList.add("hidden"); // скрываем итоговое окно статистики exam
+    addVisibilityClass(examMode); // скрываем статистику exam
+    addVisibilityClass(resultsModal); // скрываем итоговое окно статистики exam
     wordStatsObj.clear();
 
 }
@@ -249,10 +245,8 @@ function checkExamWords(selectedCards) { // проверка слов
         selectedCards[1].classList.add("correct");
         ++correctWords;
 
-
         updatePercent(percentOneCard); // процент правильных ответов
         updateNextProgressBar(examProgress, percentOneCard); // прогресс бар
-
 
         selectedCards[0].classList.add("fade-out");
         selectedCards[1].classList.add("fade-out");
@@ -264,7 +258,6 @@ function checkExamWords(selectedCards) { // проверка слов
             selectedCards[0].classList.remove("correct");
             selectedCards[1].classList.remove("wrong");
         }, 500);
-
     }
 
     if (correctWords === maxWords) { // проверка на все отвеченные слова
@@ -279,22 +272,16 @@ function checkExamWords(selectedCards) { // проверка слов
 function completeExam() {
     setTimeout(() => {
         alert("Тестирование успешно пройдено!");
-
-        imgMotivation.classList.remove("hidden");
+        removeVisibilityClass(resultsModal);
+        removeVisibilityClass(imgMotivation);
 
     }, 1000);
 
     setTimeout(() => {
 
-        imgMotivation.classList.add("hidden");
-
+        addVisibilityClass(imgMotivation);
 
     }, 5000);
-
-    setTimeout(() => {
-        resultsModal.classList.remove("hidden");
-    }, 1000);
-
 }
 
 
@@ -305,31 +292,25 @@ function createButton(buttonID, buttonText, container) {
     button.id = buttonID;
     button.style.marginBottom = "10px";
     container.append(button);
-
 }
 
 // Статистика слов и попыток
 function updateStats(obj) {
 
     const resultsContent = document.querySelector(".results-content");
-
     const wordsStats = resultsModal.querySelectorAll(".word-stats");
     wordsStats.forEach(element => element.remove());
     obj.forEach((attempts, wordStats) => {
 
-
         const copyTemplate = template.content.cloneNode(true); // копия шаблона
-
         const spanWord = copyTemplate.querySelector(".word span");
         const spanAttempts = copyTemplate.querySelector(".attempts span");
-
         spanWord.textContent = wordStats;
         spanAttempts.textContent = attempts;
-
         resultsContent.append(copyTemplate);
     });
-
 }
+
 
 //////////////////////////////////////////////////////////////////////////////// Режим тренировки
 for (let i = 0; i < maxWords; i++) {
@@ -359,12 +340,12 @@ buttonBack.addEventListener("click", function() {
     blockButtons();
 });
 
+
 // обработчик на кнопку Перемешать слова
 shuffleWords.addEventListener("click", function() {
     shuffle(wordsLearning);
     showCard(wordsLearning[cardIndex]);
 })
-
 
 
 ////////////////////////////////////////////////////////////////////////// Режим тестированиия - Экзамена
@@ -389,7 +370,7 @@ examCardsContainer.addEventListener("click", function(event) {
     if (examWords.length === 1) { // это первая карточка
         element.classList.add("correct");
 
-        /////////////////////подсчет слов
+        /////////////////////подсчет слов в статистику
 
         const wordStats = element.getAttribute("specialWord");
 
@@ -422,12 +403,12 @@ buttonStudyAgain.addEventListener("click", function() {
 
     resetExamMode();
 
-    studyMode.classList.remove("hidden"); // отобразить статистику в режиме тренировки
-    studyCards.classList.remove("hidden"); // отобразить карточки в режиме тренировки
+    removeVisibilityClass(studyMode); // отобразить статистику в режиме тренировки
+    removeVisibilityClass(studyCards); // отобразить карточки в режиме тренировки
     wordsProgress.value = percentOneCard;
     cardIndex = 0;
-    currentWord.textContent = 1;
-
+    currentWord.textContent = cardIndex + 1;
+    blockButtons();
 });
 
 
